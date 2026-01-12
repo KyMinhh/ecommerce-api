@@ -2,6 +2,8 @@ const express = require("express");
 const app = express();
 const pool = require("./config/database");
 const authRoutes = require("./modules/auth/auth.route");
+const { requireAuth } = require("./middlewares/auth.middleware");
+const { requireRole } = require("./middlewares/role.middleware");
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -29,6 +31,14 @@ app.get("/health/db", async (req, res, next) => {
     } catch (err) {
         next(err);
     }
+});
+
+app.get("/api/me", requireAuth, (req, res) =>{
+    res.json({ user: req.user });
+});
+
+app.get("/api/admin/ping", requireAuth, requireRole("ADMIN"), (req, res) => {
+    res.json({ message: "Welcome, admin user!", ok: true });
 });
 
 app.use("/api/auth", authRoutes);
