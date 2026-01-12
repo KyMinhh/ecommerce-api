@@ -4,6 +4,8 @@ const pool = require("./config/database");
 const authRoutes = require("./modules/auth/auth.route");
 const { requireAuth } = require("./middlewares/auth.middleware");
 const { requireRole } = require("./middlewares/role.middleware");
+const productRoutes  = require("./modules/product/product.route");
+
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -42,6 +44,8 @@ app.get("/api/admin/ping", requireAuth, requireRole("ADMIN"), (req, res) => {
 });
 
 app.use("/api/auth", authRoutes);
+
+app.use("/api/products", productRoutes);
 
 // Global error handler
 app.use((err, req, res, next) => {
