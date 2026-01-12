@@ -1,0 +1,20 @@
+{
+  "name": "ecommerce-api",
+  "version": "1.0.0",
+  "description": "E-commerce REST API with Node.js, Express, MySQL, JWT, Docker",
+  "main": "src/server.js",
+  "scripts": {
+    "dev": "nodemon src/server.js",
+    "start": "node src/server.js"
+  },
+  "keywords": ["nodejs", "express", "rest", "mysql", "jwt"],
+  "author": "Ky Minh",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "dotenv": "^16.3.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  }
+}
