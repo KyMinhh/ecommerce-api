@@ -5,6 +5,8 @@ const authRoutes = require("./modules/auth/auth.route");
 const { requireAuth } = require("./middlewares/auth.middleware");
 const { requireRole } = require("./middlewares/role.middleware");
 const productRoutes  = require("./modules/product/product.route");
+const cartRoutes = require("./modules/cart/cart.route");
+const orderRoutes = require("./modules/order/order.route");
 
 
 app.use(express.json());
@@ -46,6 +48,10 @@ app.get("/api/admin/ping", requireAuth, requireRole("ADMIN"), (req, res) => {
 app.use("/api/auth", authRoutes);
 
 app.use("/api/products", productRoutes);
+
+app.use("/api/cart", cartRoutes);
+
+app.use("/api/orders", orderRoutes);
 
 // Global error handler
 app.use((err, req, res, next) => {
