@@ -76,4 +76,51 @@ async function checkout(userId) {
     }
 }
 
-module.exports = { checkout };
+async function listOrdersByUser(userId, { page = 1, limit = 10 }) {
+    const safePage = Math.max(1, Number(page) || 1);
+    const safeLimit = Math.max(1, Math.min(100, Number(limit) || 10));
+    const offset = (safePage - 1) * safeLimit;
+
+    const [[countRow]] = await pool.query("SELECT COUNT(*) AS total FROM orders WHERE user_id = ?", [userId]);
+
+    const [rows] = await pool.query(
+        "SELECT id, status, total, created_at FROM orders WHERE user_id = ? ORDER BY created_at DESC LIMIT ? OFFSET ?",
+        [userId, safeLimit, offset]
+    );
+    return {
+        total: countRow.total,
+        page: safePage,
+        limit: safeLimit,
+        orders: rows
+    };
+}
+
+async function getOrderDetailForUser(userId, orderId) {
+    const [orders] = await pool.query(
+        "SELECT id, status, total, created_at FROM orders WHERE id = ? AND user_id = ?",
+        [orderId, userId]
+    );
+
+    if (orderId.length === 0) {
+        const err = new Error("Order not found");
+        err.status = 404;
+        throw err;
+    }
+    const order = orders[0];
+
+    const [items] = await pool.query(
+        "SELECT product_id AS productId, product_name AS productName, unit_price AS unitPrice, quantity, line_total AS lineTotal FROM order_items WHERE order_id = ?",
+        [orderId]
+    );
+    return { ...order, items };
+}
+
+async function updateOrderStatus(orderId, status) {
+    const [result] = await pool.query(
+        "UPDATE orders SET status = ? WHERE id = ?",
+        [status, orderId]
+    );
+    return result.affectedRows > 0;
+}
+
+module.exports = { checkout, listOrdersByUser, getOrderDetailForUser, updateOrderStatus };
